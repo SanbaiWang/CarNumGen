@@ -1,5 +1,7 @@
+# encoding=UTF-8
+
 from sqlalchemy import Column, Boolean, String, Integer, ForeignKey
-from sqlalchemy.orm import relationship, backref
+from sqlalchemy.orm import relationship
 from __init__ import Base, engine, session
 from random import seed, sample
 import re
@@ -22,17 +24,19 @@ class VIN(Base):
     def validate_vin(val):
         res = re.match(r"[a-zA-Z]{3}\d{14}", val)
         if res is None:
-            raise ValueError('Invalid VIN: incorrect format!')
+            raise ValueError('无效的 VIN: \n'
+                             '格式错误, 必须为 3位字母 + 14位数字!')
         vin = session.query(VIN).filter_by(val=val).first()
         if vin is not None:
-            raise ValueError('Invalid VIN: used VIN!')
+            raise ValueError('无效的 VIN: \n'
+                             'VIN已注册!')
         return True
 
 
 class CarNum(Base):
     __tablename__ = 'carnums'
 
-    RANDOM_QUAN = 6
+    RANDOM_QUAN = 10
 
     id = Column(Integer, primary_key=True)
     val = Column(String(4), unique=True, nullable=False, index=True)
@@ -47,8 +51,8 @@ class CarNum(Base):
         return '<CarNum(val= %s, registered=%s, vin=%s)>' % (self.val, self.registered, self.vin)
 
     @staticmethod
-    def inject():
-        with open('../carnums.txt', 'rb') as file:
+    def inject(filename):
+        with open(filename, 'rb') as file:
             carnumlist = [CarNum(val=line.strip('\n')) for line in file.readlines()]
             session.add_all(carnumlist)
             session.commit()
@@ -60,7 +64,8 @@ class CarNum(Base):
         if carnum_count < CarNum.RANDOM_QUAN:
             return query.all()
         seed()
-        return sample(query.all(), 5)
+        return sample(query.all(), 10)
 
 
 Base.metadata.create_all(engine)
+

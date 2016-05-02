@@ -1,14 +1,12 @@
-# encoding=UTF-8
+# -*- coding: cp936 -*-
+__author__ = 'kinfinger'
 import os
 import tkFileDialog
 import tkMessageBox
 from Tkinter import *
 from ttk import *
-
-
 class FileGuiChose(object):
-
-    def __init__(self, initdir=None, frame=None, showframe=None, bottomeFrame=None):
+    def __init__(self,initdir=None,frame=None,showframe=None,bottomeFrame=None):
         self.entryvar = StringVar()
         self.showframe =showframe
         # top area
@@ -16,19 +14,16 @@ class FileGuiChose(object):
         self.gentry = Entry(frame,textvariable=self.entryvar)
         self.gbutton = Button(frame,command=self.opendir,text=u'chose dir')
         self.keylistbox = Listbox(frame)
-
         #initiate the dropdown list
-        # self.keyvar = StringVar()
-        # self.keyvar.set('keyword')
-        # self.items = ['BufferPool','Close','Data Capture','Compress','Pqty','Sqty']
-        # self.gcombobox=Combobox(frame,values=self.items,textvariable=self.keyvar)
-        # self.gentry.bind('',func=self.refresh)
+        self.keyvar = StringVar()
+        self.keyvar.set('keyword')
+        self.items = ['BufferPool','Close','Data Capture','Compress','Pqty','Sqty']
+        self.gcombobox=Combobox(frame,values=self.items,textvariable=self.keyvar)
+        self.gentry.bind('',func=self.refresh)
         self.glabel.grid(row=0,column=0,sticky=W)
         self.gentry.grid(row=0,column=1)
         self.gbutton.grid(row=0,column=2)
-        # self.gcombobox.grid(row=0,column=3)
-
-
+        self.gcombobox.grid(row=0,column=3)
         # content area
         self.texbar = Scrollbar(self.showframe,orient=VERTICAL)
         self.texbar.pack(side =RIGHT,fill=Y)
@@ -38,7 +33,6 @@ class FileGuiChose(object):
         self.textbox.pack(side=LEFT,fill=BOTH)
         self.texbar.config(command=self.textbox.yview)
         self.bottombar.config(command=self.textbox.xview)
-
     def opendir(self):
         self.textbox.delete('1.0',END)
         self.dirname = tkFileDialog.askdirectory()
@@ -50,73 +44,56 @@ class FileGuiChose(object):
         for eachdir in self.dirlist:
             self.textbox.insert(END,eachdir+'\r\n')
         self.textbox.update()
-
     def refresh(self,event=None):
         self.textbox.delete('1.0',END)
         self.dirlist=os.listdir(self.entryvar.get())
         for eachdir in self.dirlist:
                 self.textbox.insert(END,unicode(eachdir,'cp936')+'\r\n')
         self.textbox.update()
-
-
-class GuiMenu(object):
+class GuiMenu():
     def hello(self):
         pass
-
-    def file(self):
+    def File(self):
         pass
-
-    def edit(self):
+    def Edit(self):
         pass
-
-    def view(self):
+    def View(self):
         pass
-
-    def help(self):
-        tkMessageBox.showinfo(self.root, u'author kinfinger \n verion 1.0 \n Thank you \n kinfinge@gmail.com ')
-
-    def __init__(self, root):
-        self.root = root
-        self.menubar = Menu(root)
+    def Help(self):
+        tkMessageBox.showinfo(self.root,u'author kinfinger \n verion 1.0 \n Thank you \n kinfinge@gmail.com ')
+    def __init__(self,rootmenu):
+        self.root=rootmenu
+        self.menubar=Menu(rootmenu)
         # create a pulldown menu, and add it to the menu bar
         filemenu = Menu(self.menubar, tearoff=0)
-        filemenu.add_command(label="Open", command=self.file)
-        filemenu.add_command(label="New", command=self.file)
-        filemenu.add_command(label="Save", command=self.file)
+        filemenu.add_command(label="Open", command=self.File)
+        filemenu.add_command(label="New", command=self.File)
+        filemenu.add_command(label="Save", command=self.File)
         filemenu.add_separator()
-        filemenu.add_command(label="Exit", command=root.quit)
+        filemenu.add_command(label="Exit", command=rootmenu.quit)
         self.menubar.add_cascade(label="File", menu=filemenu)
         # create more pulldown menus
         editmenu = Menu(self.menubar, tearoff=0)
-        editmenu.add_command(label="Cut", command=self.edit)
-        editmenu.add_command(label="Copy", command=self.edit)
-        editmenu.add_command(label="Paste", command=self.edit)
+        editmenu.add_command(label="Cut", command=self.Edit)
+        editmenu.add_command(label="Copy", command=self.Edit)
+        editmenu.add_command(label="Paste", command=self.Edit)
         self.menubar.add_cascade(label="Edit", menu=editmenu)
         helpmenu = Menu(self.menubar,tearoff=0)
-        helpmenu.add_command(label="About", command=self.help)
+        helpmenu.add_command(label="About", command=self.Help)
         self.menubar.add_cascade(label="Help", menu=helpmenu)
-        root.config(menu=self.menubar)
-
-
+        rootmenu.config(menu=self.menubar)
 def main():
     root = Tk()
-    root.title('车牌号随机生成器')
-    root.columnconfigure(0, minsize=50)
-
-    top_frame = Frame(root, height=80)
-    top_frame.pack(side=TOP)
-    
-    content_frame = Frame(root)
-    content_frame.pack(side=TOP)
-    
-    bootom_frame = Frame(root)
-    bootom_frame.pack(side=TOP)
-    
-
+    root.title('DDL Check')
+    root.columnconfigure(0,minsize=50)
+    topFrame=Frame(root,height=80)
+    contentFrame=Frame(root)
+    bottomFrame=Frame(root)
+    topFrame.pack(side=TOP)
+    contentFrame.pack(side=TOP)
+    bottomFrame.pack(side=TOP)
     GuiMenu(root)
-    
-    fguiChose=FileGuiChose(os.curdir, top_frame, content_frame, bootom_frame)
+    fguiChose=FileGuiChose(os.curdir,topFrame,contentFrame,bottomFrame)
     mainloop()
-
 if __name__ == '__main__':
     main()
